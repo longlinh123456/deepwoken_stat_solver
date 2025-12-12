@@ -1,0 +1,14 @@
+{
+    "openFiles": [
+        "Playground.mzn",
+        "Untitled1.dzn"
+    ],
+    "openTab": 1,
+    "projectFiles": [
+        "Playground.mzn",
+        "Untitled1.dzn",
+        "solver_config.mpc"
+    ],
+    "selectedSolverConfigFile": "solver_config.mpc",
+    "version": 106
+}
