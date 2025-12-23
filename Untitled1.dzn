@@ -3,22 +3,37 @@
 % stats are represented as an array, with attributes in the following order: str, ftd, agi, int, wll, cha, hvy, med, lht, fir, ice, ltn, wnd, sdw, mtl, bld
 
 % allow preshrine shrine of blasphemy
-preshrine_blasphemy = false;
+preshrine_blasphemy = true;
+% this option has two valid values: None and Bladeharper
+% setting this to Bladeharper will enforce bladeharper requirements
+special_oath = None;
+shrine_steps = 3;
 
+initial_constraint = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 % preshrine constraints will be satisfied (invested points >= constraint points) preshrine
 preshrine_constraint = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 % same for postshrine
-postshrine_constraint = [0, 90, 0, 0, 0, 0, 0, 0, 0, 0, 0, 80, 35, 0, 0, 0];
+postshrine_constraint = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+end_constraint = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 % following constraints will be satisfied preshrine OR postshrine
 % each row of the following array is a constraint statblock
 % all attributes of a statblock will be satisfied at the same time
 % statblocks are independent: one statblock being satisfied preshrine does not mean other statblocks will also be satisfied preshrine
 % copy the row (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|) to create a new constraint statblock
-constraints = [|
-    40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
-    0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
-    0, 0, 0, 45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
-    0, 0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
-    0, 0, 0, 0, 0, 55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
-|];
+constraints = (
+    talent: (
+        and: [|
+        |],
+        or: [|
+        |]
+    ),
+    non_talent: (
+        and: [|
+        |],
+        or: [|
+        |]
+    ),
+    sum: []
+)
+    
