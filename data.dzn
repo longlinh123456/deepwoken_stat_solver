@@ -1,0 +1,206 @@
+% the solver does use shrine of mastery (both preshrine and postshrine)
+% define the phases of a build as follows (a step is a stat spread you invest towards; using som or shrine creates a new step):
+% initial: the first step of the build
+% preshrine: the last step before using shrine
+% postshrine: the step right after using shrine
+% end: the final step of the build
+% solver will try to minimize shrine use, then the number of initial points invested, then the number of postshrine points invested 
+% stats are represented as an array, with attributes in the following order: str, ftd, agi, int, wll, cha, hvy, med, lht, fir, ice, ltn, wnd, sdw, mtl, bld
+
+% each record in the following array represents a constraint group (all constraints in a constraint group will be satisfied at the same build step)
+% each talent, oath, and weapon correspond to one constraint group
+% a constraint group consists of 3 fields:
+
+% timing: when the constraint may be fulfilled, valid values are Free, Initial, Preshrine, Postshrine, End, BeforeShrine, AfterShrine
+% Free timing means the constraint may be fulfilled at any step in the build
+% BeforeShrine means the constraint may be fulfilled at any step before using shrine, same for AfterShrine
+% other timing options corresponds to a build step each
+
+% is_talent: true if the constraint group is a talent constraint, and therefore restricts som use, false if the constraint is not a talent constraint
+
+% body: an array with each element being a constraint in the constraint group
+
+% a constraint consists of 3 fields:
+
+% kind: valid values are And, Or and Sum
+% And constraints require all stats to be satisfied at once
+% Or constraints require at least one stat to be satisfied
+% Sum constraints require the stat points invested in the chosen stats to equal or exceed the target field
+
+% requirements: an array representing 
+% for And and Or constraints, the array represents the minimum number of points invested in each stat
+% for Sum constraints, the nonzero stats are summed up
+
+% target: in Sum constraints, the sum of the nonzero stats in the array must equal or exceed this value, ignored in other kinds of constraints (put 1 in this field if so)
+
+% some constraint examples:
+
+% chorus of souls requirements, can be satisfied at any time (is_talent is true because this is a talent):
+% (
+%     timing: Free,
+%     is_talent: true,
+%     body: [(
+%         kind: And,
+%         requirements: [0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 30, 30, 30, 30, 30, 30],
+%         target: 1
+%     )]
+% )
+
+% silentheart requirements (these must be satisfied after using shrine because cannot shrine with oath):
+% (
+%     timing: AfterShrine,
+%     is_talent: false,
+%     body: [(
+%         kind: Sum,
+%         requirements: [0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+%         target: 75
+%     ),
+%     (
+%         kind: And,
+%         requirements: [25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+%         target: 1
+%     ),
+%     (
+%         kind: Or,
+%         requirements: [0, 0, 25, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+%         target: 1
+%     )]
+% )
+
+% 80 ironsing at the end:
+% (
+%     timing: End,
+%     is_talent: false,
+%     body: [(
+%         kind: And,    
+%         requirements: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 80, 0],
+%         target: 1
+%     )]
+% )
+
+% silentheart requirements filled in
+constraints = [
+    (
+        timing: Initial,
+        is_talent: false,
+        body: [(
+            kind: And,
+            requirements: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0],
+            target: 1
+        )],
+        prerequisites: {}
+    ),
+    (
+        timing: FreeTiming,
+        is_talent: true,
+        body: [(
+            kind: And,
+            requirements: [40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            target: 1
+        )],
+        prerequisites: {}
+    ),
+    (
+        timing: End,
+        is_talent: true,
+        body: [(
+            kind: And,
+            requirements: [0, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            target: 1
+        )],
+        prerequisites: {}
+    ),
+    (
+        timing: FreeTiming,
+        is_talent: true,
+        body: [(
+            kind: Or,
+            requirements: [0, 0, 0, 35, 35, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            target: 1
+        )],
+        prerequisites: {}
+    ),
+    (
+        timing: FreeTiming,
+        is_talent: true,
+        body: [(
+            kind: And,
+            requirements: [0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            target: 1
+        )],
+        prerequisites: {}
+    ),
+    (
+        timing: FreeTiming,
+        is_talent: true,
+        body: [(
+            kind: And,
+            requirements: [0, 0, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            target: 1
+        )],
+        prerequisites: {}
+    ),
+    (
+        timing: FreeTiming,
+        is_talent: true,
+        body: [(
+            kind: And,
+            requirements: [0, 15, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            target: 1
+        )],
+        prerequisites: {}
+    ),
+    (
+        timing: FreeTiming,
+        is_talent: true,
+        body: [(
+            kind: And,
+            requirements: [20, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            target: 1
+        )],
+        prerequisites: {}
+    ),
+    (
+        timing: FreeTiming,
+        is_talent: true,
+        body: [(
+            kind: And,
+            requirements: [0, 0, 20, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            target: 1
+        )],
+        prerequisites: {}
+    ),
+    (
+        timing: AfterShrine,
+        is_talent: false,
+        body: [(
+            kind: And,
+            requirements: [0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            target: 1
+        )],
+        prerequisites: {}
+    ),
+    (
+        timing: End,
+        is_talent: false,
+        body: [(
+            kind: And,
+            requirements: [0, 0, 0, 0, 0, 0, 0, 50, 0, 0, 80, 0, 57, 0, 0, 0],
+            target: 1
+        )],
+        prerequisites: {}
+    ),  
+];
+
+% allow preshrine shrine of blasphemy
+preshrine_blasphemy = true;
+% choose an aspect
+fixed_aspect = NoAspect;
+allow_dev_aspects = false;
+allow_multifaceted = false;
+% this option has two valid values: None and Bladeharper
+% setting this to Bladeharper will enforce bladeharper requirements
+% please set this to None and add normal constraints for all other oaths (their requirements can be expressed as normal constraints)
+special_oath = NoSpecialOath;
+% the number of mastery steps searched (solver will only use 1 mastery step to reallocate 3 points in most cases)
+mastery_steps = 2;

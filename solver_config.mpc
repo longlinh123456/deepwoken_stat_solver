@@ -1,4 +1,6 @@
 {
+    "-O": 2,
+    "free-search": true,
     "intermediate-solutions": true,
     "output-objective": true,
     "parallel": 16,
