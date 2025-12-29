@@ -46,8 +46,7 @@ class Maximize:
         return f"solve{generate_warm_start()} :: int_search([shrine_point, multifaceted_point] ++ mastery_points ++ array1d(stats), input_order, indomain_median) maximize {self.expr};"
 
 
-optimize_pre = [Maximize(f"stats[5, {i}]") for i in optimize] + [
-    Maximize("stats[5, 13]"),
+optimize_pre = [Maximize(f"stats[{mastery_steps+2}, {i}]") for i in optimize] + [
     Minimize("bool2int(aspect != NoAspect)"),
     Minimize("bool2int(multifaceted_point != SENTINEL_POINT)"),
     Minimize("count(i in MASTERY_INDEX_SET) (mastery_points[i] != SENTINEL_POINT)"),
@@ -89,10 +88,10 @@ for objective in optimize_pre:
 
 optimize_mid = [
     Minimize(f"sum(i in ALL_STATS) (stats[{i}, i])")
-    for i in range(0, objective_value[2] + 2)
+    for i in range(0, objective_value[-1] + 2)
 ] + [
     Maximize(f"sum(i in ALL_STATS) (stats[{i}, i] ^ 2)")
-    for i in range(0, objective_value[2] + 2)
+    for i in range(0, objective_value[-1] + 2)
 ]
 for objective in optimize_mid:
     perform_objective(objective)
