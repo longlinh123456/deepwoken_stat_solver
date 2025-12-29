@@ -1,6 +1,7 @@
 from minizinc import Instance, Model, Solver
 from attribute import *
 import time
+import sys
 
 
 # change these variables
@@ -74,6 +75,9 @@ def perform_objective(objective):
         )
         objective_value.append(result.objective)
     instance.add_string(f"constraint {objective.expr} = {result.objective};")
+    if not result.status.has_solution():
+        print("Constraints are unsatisfiable, exiting.")
+        sys.exit(0)
     print(f"finished optimizing objective {objective.expr} = {result.objective}")
 
 
