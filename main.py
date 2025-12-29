@@ -31,6 +31,25 @@ def generate_warm_start():
     )"""
 
 
+def print_results():
+    stats = result.solution.stats
+    mastery_points = result.solution.mastery_points
+    mex = result.solution.mex
+    multifaceted_point = result.solution.multifaceted_point
+    shrine_point = result.solution.shrine_point
+
+    for i in range(mex):
+        if i in mastery_points:
+            print("SoM step: ", end="")
+        elif i == multifaceted_point:
+            print("Multifaceted step: ", end="")
+        elif i == shrine_point:
+            print("SoO step: ", end="")
+        else:
+            print("Initial step: ", end="")
+        print(stats[i])
+
+
 class Minimize:
     def __init__(self, expr):
         self.expr = expr
@@ -79,6 +98,7 @@ def perform_objective(objective):
         print("Constraints are unsatisfiable, exiting.")
         sys.exit(0)
     print(f"finished optimizing objective {objective.expr} = {result.objective}")
+    print_results()
 
 
 start_time = time.time()
@@ -102,20 +122,4 @@ for objective in optimize_mid:
 for objective in optimize_post:
     perform_objective(objective)
 
-stats = result.solution.stats
-mastery_points = result.solution.mastery_points
-mex = result.solution.mex
-multifaceted_point = result.solution.multifaceted_point
-shrine_point = result.solution.shrine_point
-
-for i in range(mex):
-    if i in mastery_points:
-        print("SoM step: ", end="")
-    elif i == multifaceted_point:
-        print("Multifaceted step: ", end="")
-    elif i == shrine_point:
-        print("SoO step: ", end="")
-    else:
-        print("Initial step: ", end="")
-    print(stats[i])
 print(f"Took {time.time() - start_time:.3f} seconds")
