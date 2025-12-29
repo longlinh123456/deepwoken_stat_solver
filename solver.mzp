@@ -1,14 +1,12 @@
 {
     "openFiles": [
         "model.mzn",
-        "data.dzn",
-        "solution.dzn"
+        "data.dzn"
     ],
     "openTab": 0,
     "projectFiles": [
         "data.dzn",
         "model.mzn",
-        "solution.dzn",
         "solver_config.mpc"
     ],
     "selectedSolverConfigFile": "solver_config.mpc",
