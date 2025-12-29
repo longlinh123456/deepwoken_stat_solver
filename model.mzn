@@ -104,7 +104,12 @@ constraint forall(i in ALL_TIMING_POINTS) (
         then forall(k in ALL_STATS) (stats[i, k] = stats[i-1, k])
     else true endif
 );
-constraint forall(i in MASTERY_INDEX_SET) ((mastery_points[i] != SENTINEL_POINT) -> forall(j in ALL_STATS) (stats[mastery_points[i], j] >= stats[mastery_points[i]-1, j] - mastery_delta[i, j]));
+constraint forall(i in MASTERY_INDEX_SET) ((mastery_points[i] != SENTINEL_POINT) -> forall(j in ALL_STATS) (
+    if mastery_delta[i, j] > 0 
+        then stats[mastery_points[i], j] = stats[mastery_points[i]-1, j] - mastery_delta[i, j] 
+        else stats[mastery_points[i], j] >= stats[mastery_points[i]-1, j] 
+    endif
+));
 
 predicate is_participating_stat(ALL_STATS: i) = stats[shrine_point-1, i] > if multifaceted_point < shrine_point then 0 else innate_stats[i] endif;
 
@@ -159,7 +164,7 @@ endif;
 constraint (aspect = NoAspect \/ (not allow_multifaceted)) -> (multifaceted_point = SENTINEL_POINT);
 constraint forall(i in MASTERY_INDEX_SET) (if mastery_points[i] != SENTINEL_POINT
     then sum(mastery_delta[i, ..]) > 0
-    else sum(mastery_delta[i, ..]) = 0
+    else mastery_delta[i, ..] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 endif);
 
 constraint (aspect != NoAspect) -> forall(i in {0} union ALL_TIMING_POINTS, j in ALL_STATS) ((i < multifaceted_point) -> (stats[i, j] >= innate_stats[j]));
@@ -175,10 +180,20 @@ constraint (shrine_point + 1 != SENTINEL_POINT /\ shrine_point + 1 in mastery_po
     forall(i in UNLIMITED_SHRINE_STATS, j in ATTUNEMENT_THRESHOLDS diff {1})
         (((stats[shrine_point, i] > j)) -> (stats[shrine_point + 1, i] >= j)) /\ 
     forall(i in UNLIMITED_SHRINE_STATS) ((stats[shrine_point, i] >= 1) -> (stats[shrine_point + 1, i] >= 1));
-constraint forall(i in ALL_STATS, j in MASTERY_INDEX_SET) ((mastery_points[j] < shrine_point /\ mastery_delta[j, i] > 0) -> 
-    forall(k in mastery_points[j]+1..shrine_point-1) ((k != multifaceted_point) -> (stats[k, i] <= stats[mastery_points[j], i])));
-constraint forall(i in ALL_STATS, j in MASTERY_INDEX_SET) ((mastery_points[j] > shrine_point /\ mastery_delta[j, i] > 0) -> 
-    forall(k in ALL_TIMING_POINTS) ((k > mastery_points[j] /\ k != multifaceted_point) -> (stats[k, i] <= stats[mastery_points[j], i])));
+constraint forall(i in ALL_STATS, j in MASTERY_INDEX_SET where mastery_points[j] < shrine_point) ((mastery_delta[j, i] > 0) -> ( 
+    forall(k in mastery_points[j]+1..shrine_point-1) (stats[k, i] = stats[mastery_points[j], i]) /\
+    forall(k in j+1..mastery_steps) ((mastery_points[k] < shrine_point) -> (mastery_delta[k, i] = 0))
+));
+constraint forall(i in ALL_STATS, j in MASTERY_INDEX_SET where mastery_points[j] > shrine_point /\ mastery_points[j] != SENTINEL_POINT) ((mastery_delta[j, i] > 0) -> 
+    (
+        forall(k in ALL_TIMING_POINTS) ((k > mastery_points[j] /\ k != multifaceted_point) -> (stats[k, i] = stats[mastery_points[j], i])) /\
+        forall(k in j+1..mastery_steps) (mastery_delta[k, i] = 0)
+    )
+);
+constraint forall(i in UNLIMITED_SHRINE_STATS) ((stats[shrine_point-1, i] = 0) -> (
+    stats[shrine_point, i] = 0 /\ 
+    forall(j in shrine_point+1..mastery_steps+2) (stats[j, i] != 1))
+);
     
 constraint forall(constraint_group in constraints) (
     exists(i in timing_to_range[constraint_group.timing]) (satisfy_constraint(stats[i, ..], constraint_group)) /\
@@ -191,25 +206,24 @@ constraint forall(constraint_group in constraints) (
             max([if satisfy_constraint(stats[i, ..], constraint_group) then i else -1 endif | i in timing_to_range[constraint_group.timing]]) 
     )
 );
-
-solve :: goal_hierarchy(
-    [
-        int_min_goal(bool2int(aspect != NoAspect)),
-        int_min_goal(bool2int(multifaceted_point != SENTINEL_POINT)),
-    ] ++
-    [int_min_goal(sum(i in ALL_STATS) (stats[j, i])) | j in {0} union ALL_TIMING_POINTS] ++
-    [int_max_goal(sum(i in ALL_STATS) (stats[j, i] ^ 2)) | j in {0} union ALL_TIMING_POINTS] ++
-    [
-        int_min_goal(count(i in MASTERY_INDEX_SET) (mastery_points[i] < shrine_point)),
-        int_min_goal(count(i in MASTERY_INDEX_SET) (mastery_points[i] != SENTINEL_POINT /\ mastery_points[i] >= shrine_point)),
-        int_min_goal(preshrine_mastery_points_used),
-        int_min_goal(postshrine_mastery_points_used)
-    ]
-) satisfy;
-output ["Aspect: " ++ show(aspect) ++ "\n"] ++ [ 
-    if fix(i) < fix(mex) then
-        if fix(i) = 0 then "Initial step: " elseif fix(i) in fix(mastery_points) then "SOM step: " elseif fix(i) = fix(shrine_point) then "SOO step: " elseif fix(i) = fix(multifaceted_point) then "Multifaceted step: " else "" endif ++ 
-        show(stats[i, ..]) ++ "\n"
-    else "" endif
-    | i in {0} union ALL_TIMING_POINTS
-];
+% solve :: goal_hierarchy(
+%     [
+%         int_min_goal(bool2int(aspect != NoAspect)),
+%         int_min_goal(bool2int(multifaceted_point != SENTINEL_POINT)),
+%     ] ++
+%     [int_min_goal(sum(i in ALL_STATS) (stats[j, i])) | j in {0} union ALL_TIMING_POINTS] ++
+%     [int_max_goal(sum(i in ALL_STATS) (stats[j, i] ^ 2)) | j in {0} union ALL_TIMING_POINTS] ++
+%     [
+%         int_min_goal(count(i in MASTERY_INDEX_SET) (mastery_points[i] < shrine_point)),
+%         int_min_goal(count(i in MASTERY_INDEX_SET) (mastery_points[i] != SENTINEL_POINT /\ mastery_points[i] >= shrine_point)),
+%         int_min_goal(preshrine_mastery_points_used),
+%         int_min_goal(postshrine_mastery_points_used)
+%     ]
+% ) satisfy;
+% output ["Aspect: " ++ show(aspect) ++ "\n"] ++ [ 
+%     if fix(i) < fix(mex) then
+%         if fix(i) = 0 then "Initial step: " elseif fix(i) in fix(mastery_points) then "SOM step: " elseif fix(i) = fix(shrine_point) then "SOO step: " elseif fix(i) = fix(multifaceted_point) then "Multifaceted step: " else "" endif ++ 
+%         show(stats[i, ..]) ++ "\n"
+%     else "" endif
+%     | i in {0} union ALL_TIMING_POINTS
+% ];

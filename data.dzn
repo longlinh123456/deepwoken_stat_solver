@@ -109,12 +109,10 @@ constraints = [
 
 % allow preshrine shrine of blasphemy
 preshrine_blasphemy = true;
-% choose an aspect
+% choose an aspect (valid values are NoAspect (multifaceted), FreeAspect and the aspect names)
 fixed_aspect = FreeAspect;
 allow_multifaceted = true;
-% this option has two valid values: None and Bladeharper
+% this option has two valid values: NoSpecialOath and Bladeharper
 % setting this to Bladeharper will enforce bladeharper requirements
 % please set this to None and add normal constraints for all other oaths (their requirements can be expressed as normal constraints)
 special_oath = NoSpecialOath;
-% the number of mastery steps searched (solver will only use 1 mastery step to reallocate 3 points in most cases)
-mastery_steps = 3;

@@ -1,0 +1,16 @@
+STR = 1
+FTD = 2
+AGI = 3
+INT = 4
+WLL = 5
+CHA = 6
+HVY = 7
+MED = 8
+LHT = 9
+FIR = 10
+ICE = 11
+LTN = 12
+WND = 13
+SDW = 14
+MTL = 15
+BLD = 16
