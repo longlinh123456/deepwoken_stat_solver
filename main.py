@@ -90,7 +90,7 @@ def perform_objective(objective):
             optimisation_level=5,
             intermediate_solutions=False,
             free_search=True,
-            params="optimize_with_core:true, optimize_with_max_hs:true, symmetry_level:4",
+            params="optimize_with_core:true, symmetry_level:4",
         )
         objective_value.append(result.objective)
     instance.add_string(f"constraint {objective.expr} = {result.objective};")
