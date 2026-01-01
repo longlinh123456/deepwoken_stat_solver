@@ -87,10 +87,10 @@ def perform_objective(objective):
         child.add_string(objective.solve_statement())
         result = child.solve(
             processes=16,
-            optimisation_level=5,
+            optimisation_level=2,
             intermediate_solutions=False,
             free_search=True,
-            params="optimize_with_core:true, symmetry_level:4",
+            params="symmetry_level:4",
         )
         objective_value.append(result.objective)
     instance.add_string(f"constraint {objective.expr} = {result.objective};")
