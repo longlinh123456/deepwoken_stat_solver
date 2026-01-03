@@ -1,6 +1,6 @@
 [project]
 name = "deepwoken-stat-solver"
-version = "0.1.0"
+version = "0.2.0"
 description = "a minizinc model that solves deepwoken stat building and a python script that implements lexicographic objective"
 readme = "README.md"
 requires-python = ">=3.13"

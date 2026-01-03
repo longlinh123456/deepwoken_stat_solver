@@ -14,7 +14,7 @@ type StatSpread = array[ALL_STATS] of STAT_RANGE;
 type Constraint = record(
     ConstraintKind: kind,
     StatSpread: requirements,
-    1..true_max_invested_points: target,
+    1..330: target,
 );
 type ConstraintGroup = record(
     ConstraintTiming: timing,
@@ -28,27 +28,27 @@ int: SENTINEL_POINT = mastery_steps + 3;
 enum ConstraintKind = {And, Or, Sum};
 enum ConstraintTiming = {FreeTiming, Initial, Preshrine, Postshrine, End, BeforeShrine, AfterShrine};
 enum SpecialOath = {Bladeharper, NoSpecialOath};
-enum ConcreteAspect = {Adret, Canor, Capra, Celtor, Chrysid, Etrean, Felinor, Ganymede, Gremor, Khan, Kiron, Tiran, Vesperian, Drakkard, Heliodar, Lightborn};
-enum Aspect = ToAspect(ConcreteAspect) ++ {FreeAspect, NoAspect};
+enum Aspect = {FreeAspect, NoAspect, Adret, Canor, Capra, Celtor, Chrysid, Etrean, Felinor, Ganymede, Gremor, Khan, Kiron, Tiran, Vesperian, Drakkard, Heliodar, Lightborn};
+set of Aspect: DEV_ASPECTS = {Drakkard, Heliodar, Lightborn};
 array[Aspect, ALL_STATS] of STAT_RANGE: aspect_stats = [|
     FreeAspect: 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
     NoAspect: 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
-    ToAspect(Adret): 0, 0, 0, 0, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
-    ToAspect(Canor): 3, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
-    ToAspect(Capra): 0, 0, 0, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
-    ToAspect(Celtor): 0, 0, 0, 2, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
-    ToAspect(Chrysid): 0, 0, 2, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
-    ToAspect(Etrean): 0, 0, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
-    ToAspect(Felinor): 0, 0, 3, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
-    ToAspect(Ganymede): 0, 0, 0, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
-    ToAspect(Gremor): 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
-    ToAspect(Khan): 3, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
-    ToAspect(Kiron): 0, 0, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
-    ToAspect(Tiran): 0, 0, 3, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
-    ToAspect(Vesperian): 0, 3, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
-    ToAspect(Drakkard): 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
-    ToAspect(Heliodar): 3, 3, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
-    ToAspect(Lightborn): 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
+    Adret: 0, 0, 0, 0, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
+    Canor: 3, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
+    Capra: 0, 0, 0, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
+    Celtor: 0, 0, 0, 2, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
+    Chrysid: 0, 0, 2, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
+    Etrean: 0, 0, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
+    Felinor: 0, 0, 3, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
+    Ganymede: 0, 0, 0, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
+    Gremor: 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
+    Khan: 3, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
+    Kiron: 0, 0, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
+    Tiran: 0, 0, 3, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
+    Vesperian: 0, 3, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
+    Drakkard: 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
+    Heliodar: 3, 3, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
+    Lightborn: 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|
 |];
 array[ConstraintTiming] of var set of TimingPoint: timing_to_range = [
     FreeTiming: {0} union ALL_TIMING_POINTS,
@@ -60,17 +60,21 @@ array[ConstraintTiming] of var set of TimingPoint: timing_to_range = [
     AfterShrine: shrine_point..(mastery_steps + 2)
 ];
 
-325..: true_max_invested_points = 325 + max(i in Aspect) (sum(aspect_stats[i, ..]));
-
 SpecialOath: special_oath;
 bool: preshrine_blasphemy;
 array[int] of ConstraintGroup: constraints;
-0..3: mastery_steps = 3;
+0..3: mastery_steps;
 bool: allow_multifaceted;
 bool: allow_dev_aspects;
 Aspect: fixed_aspect;
-ConcreteAspect: original_aspect;
-var Aspect diff {FreeAspect}: aspect;
+var (if fixed_aspect != FreeAspect 
+        then {fixed_aspect} 
+        else if not allow_multifaceted 
+            then {NoAspect} 
+            else Aspect 
+        endif
+    endif)
+diff ({FreeAspect} union if allow_dev_aspects then {} else DEV_ASPECTS endif): aspect;
 var StatSpread: innate_stats = [aspect_stats[aspect, i] | i in ALL_STATS];
 
 array[{0} union ALL_TIMING_POINTS, ALL_STATS] of var STAT_RANGE: stats;
@@ -90,7 +94,7 @@ function var 0..: mastery_diff(var StatSpread: before, var StatSpread: after) = 
 
 predicate satisfy_and(var StatSpread: stats, StatSpread: requirements) = forall(i in ALL_STATS) (stats[i] >= requirements[i]);
 predicate satisfy_or(var StatSpread: stats, StatSpread: requirements) = exists(i in non_zero_indices(requirements)) (stats[i] >= requirements[i]);
-predicate satisfy_sum(var StatSpread: stats, StatSpread: requirements, 1..true_max_invested_points: target) = sum(i in non_zero_indices(requirements)) (stats[i]) >= target;
+predicate satisfy_sum(var StatSpread: stats, StatSpread: requirements, 1..330: target) = sum(i in non_zero_indices(requirements)) (stats[i]) >= target;
 
 var set of ALL_TIMING_POINTS union {SENTINEL_POINT}: all_points = mastery_points union {multifaceted_point, shrine_point};
 var ALL_TIMING_POINTS union {SENTINEL_POINT}: mex;
@@ -153,7 +157,7 @@ predicate satisfy_constraint(var StatSpread: stats, ConstraintGroup: constraint_
 predicate mastery_constraint(ConstraintGroup: constraint_group) = constraint_group.is_talent -> let {
     array[int] of Constraint: body = constraint_group.body;
     var set of TimingPoint: range = timing_to_range[constraint_group.timing];
-    var TimingPoint: final_satisfied = max([i | i in range where satisfy_constraint(stats[i, ..], constraint_group)]);
+    var TimingPoint: final_satisfied = max([if satisfy_constraint(stats[i, ..], constraint_group) then i else 0 endif | i in range]);
 } in forall(i in mastery_points, requirement in body where i > final_satisfied) (
     let {
         ConstraintKind: kind = requirement.kind;
@@ -162,20 +166,14 @@ predicate mastery_constraint(ConstraintGroup: constraint_group) = constraint_gro
         forall(s in non_zero_indices(requirements)) ((stats[i, s] = stats[i-1, s]) \/ (stats[i, s] >= requirements[s]))
 );
 
-constraint if fixed_aspect != FreeAspect then aspect = fixed_aspect else 
-    if not allow_multifaceted then aspect = NoAspect endif
-endif;
+constraint (fixed_aspect = FreeAspect /\ allow_multifaceted /\ aspect != NoAspect) -> (multifaceted_point != SENTINEL_POINT);
 constraint (aspect = NoAspect \/ (not allow_multifaceted)) -> (multifaceted_point = SENTINEL_POINT);
-constraint (not allow_dev_aspects) -> (aspect in Aspect diff {ToAspect(Drakkard), ToAspect(Heliodar), ToAspect(Lightborn)});
 
-constraint (aspect != NoAspect) -> forall(i in {0} union ALL_TIMING_POINTS, j in ALL_STATS where i < multifaceted_point) (stats[i, j] >= innate_stats[j]);
+constraint aspect != NoAspect -> forall(i in 0..multifaceted_point-1, j in ALL_STATS) (stats[i, j] >= innate_stats[j]);
 
-var 0..: max_invested_points = 325 + if aspect = NoAspect then sum(aspect_stats[ToAspect(original_aspect), ..]) else sum(innate_stats) endif;
-constraint forall(i in {0} union ALL_TIMING_POINTS) (let {
-    var 0..1600: effective_invested_points = sum(stats[i, ..]) - max(0, count(j in UNLIMITED_SHRINE_STATS) (stats[i, j] > 0) - 1)
-} in effective_invested_points >= 0 /\ effective_invested_points <= max_invested_points);
+constraint forall(i in {0} union ALL_TIMING_POINTS) (sum(stats[i, ..]) - max(0, count(j in UNLIMITED_SHRINE_STATS) (stats[i, j] > 0) - 1) in 0..330);
 constraint exists(i in 0..shrine_point-1) (sum(stats[i, ..]) - max(0, count(j in UNLIMITED_SHRINE_STATS) (stats[i, j] > 0) - 1) >= if preshrine_blasphemy then 90 else 135 endif);
-constraint (special_oath = Bladeharper) -> exists(i in {0} union ALL_TIMING_POINTS) (
+constraint (special_oath = Bladeharper) -> exists(i in shrine_point..mastery_steps+2) (
     (stats[i, 1] >= 25 \/ stats[i, 3] >= 25) /\ 
     (stats[i, 8] >= 75 \/ sum(stats[i, 7..9]) >= 90)
 );
@@ -186,18 +184,22 @@ constraint forall(
     ((stats[j-1, i] >= k) -> (stats[j, i] >= k));
 constraint (shrine_point + 1 != SENTINEL_POINT /\ shrine_point + 1 in mastery_points) -> 
     forall(i in UNLIMITED_SHRINE_STATS, j in ATTUNEMENT_THRESHOLDS diff {1})
-        (((stats[shrine_point, i] > j)) -> (stats[shrine_point + 1, i] >= j)) /\ 
+        ((stats[shrine_point, i] > j \/ stats[shrine_point-1, i] >= j) -> (stats[shrine_point + 1, i] >= j)) /\ 
     forall(i in UNLIMITED_SHRINE_STATS) ((stats[shrine_point, i] >= 1) -> (stats[shrine_point + 1, i] >= 1));
-constraint forall(i in ALL_STATS, j in mastery_points where j < shrine_point) ((stats[j-1, i] - stats[j, i] > 0) ->  
-    forall(k in j+1..shrine_point-1) (stats[k, i] = stats[j, i])
+constraint forall(i in ALL_STATS, j in mastery_points where j < shrine_point) (
+    (stats[j-1, i] - stats[j, i] > 0) ->  
+    forall(k in j+1..shrine_point-1) (stats[k, i] <= stats[j-1, i])
 );
 constraint forall(i in ALL_STATS, j in mastery_points where j > shrine_point) ( 
     (stats[j-1, i] - stats[j, i] > 0) ->
-    forall(k in ALL_TIMING_POINTS diff {multifaceted_point} where k > j) (stats[k, i] = stats[j, i])
+    forall(k in ALL_TIMING_POINTS diff {multifaceted_point} where k > j) (stats[k, i] <= stats[j-1, i])
 );
-constraint forall(i in UNLIMITED_SHRINE_STATS where stats[shrine_point-1, i] = 0) (
-    stats[shrine_point, i] = 0 /\ 
-    forall(j in shrine_point+1..mastery_steps+2) (stats[j, i] != 1)
+constraint multifaceted_point = SENTINEL_POINT \/ exists(i in ALL_STATS where innate_stats[i] > 0) (
+    if multifaceted_point < shrine_point 
+        then forall(j in ALL_TIMING_POINTS where j in multifaceted_point..shrine_point-1) (stats[j, i] <= stats[multifaceted_point-1, i])
+    elseif multifaceted_point > shrine_point
+        then forall(j in ALL_TIMING_POINTS where j >= multifaceted_point) (stats[j, i] <= stats[multifaceted_point-1, i])
+    endif
 );
     
 constraint forall(constraint_group in constraints) (
