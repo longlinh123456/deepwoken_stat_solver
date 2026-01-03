@@ -6,36 +6,53 @@ import sys
 
 # change these variables
 mastery_steps = 3  # the number of mastery steps to search
-optimize = []  # add the stats you want to optimize here from left to right order
+optimize = (
+    []
+)  # add the stats you want to optimize here (as capitalized abbreviations) in left to right order
 
 
 objective_value = []
 result = None
-search_annotation = ":: set_search([mastery_points], anti_first_fail, indomain_split) :: int_search([shrine_point, multifaceted_point] ++ array1d(stats), anti_first_fail, indomain_split)"
 
 
-def generate_warm_start():
+def generate_annotation():
     if result is None:
-        return ""
+        return """seq_search([
+    set_search([mastery_points], dom_w_deg, indomain_max),
+    int_search([enum2int(aspect), shrine_point, multifaceted_point], dom_w_deg, indomain_min)
+] ++ [
+    int_search(stats[i, ..], dom_w_deg, indomain_min) | i in {0} union ALL_TIMING_POINTS
+])"""
     stats = [str(element) for row in result.solution.stats for element in row]
     mex = result.solution.mex
+    aspect = result.solution.aspect
     mastery_points = [str(element) for element in result.solution.mastery_points]
     shrine_point = result.solution.shrine_point
     multifaceted_point = result.solution.multifaceted_point
 
-    return f""" :: warm_start(
-        array1d(stats) ++ [shrine_point, multifaceted_point, mex],
-        [{", ".join(stats)}, {shrine_point}, {multifaceted_point}, {mex}]
-    ) :: warm_start([mastery_points], [{{{", ".join(mastery_points)}}}])"""
+    warm_start = f"""warm_start_array([
+    warm_start(
+        array1d(stats) ++ [shrine_point, multifaceted_point, mex, enum2int(aspect)],
+        [{", ".join(stats)}, {shrine_point}, {multifaceted_point}, {mex}, enum2int({aspect})]
+    ),
+    warm_start([mastery_points], [{{{", ".join(mastery_points)}}}])
+])"""
+    return f"""seq_search([
+    {warm_start},
+    set_search([mastery_points], dom_w_deg, indomain_max),
+    int_search([enum2int(aspect), shrine_point, multifaceted_point], dom_w_deg, indomain_min)
+] ++ [
+    int_search(stats[i, ..], dom_w_deg, indomain_min) | i in {{0}} union ALL_TIMING_POINTS
+])"""
 
 
-def print_results():
-    stats = result.solution.stats
-    mastery_points = result.solution.mastery_points
-    mex = result.solution.mex
-    multifaceted_point = result.solution.multifaceted_point
-    shrine_point = result.solution.shrine_point
-    aspect = result.solution.aspect
+def print_results(solution):
+    stats = solution.stats
+    mastery_points = solution.mastery_points
+    mex = solution.mex
+    multifaceted_point = solution.multifaceted_point
+    shrine_point = solution.shrine_point
+    aspect = solution.aspect
 
     print(f"Aspect: {aspect}")
     for i in range(mex):
@@ -55,7 +72,7 @@ class Minimize:
         self.expr = expr
 
     def solve_statement(self):
-        return f"solve{generate_warm_start()} {search_annotation} minimize {self.expr};"
+        return f"solve :: {generate_annotation()} minimize {self.expr};"
 
 
 class Maximize:
@@ -63,11 +80,13 @@ class Maximize:
         self.expr = expr
 
     def solve_statement(self):
-        return f"solve{generate_warm_start()} {search_annotation} maximize {self.expr};"
+        return f"solve :: {generate_annotation()} maximize {self.expr};"
 
 
 optimize_pre = [Maximize(f"stats[{mastery_steps+2}, {i}]") for i in optimize] + [
-    Minimize("bool2int(aspect != NoAspect)"),
+    Minimize(
+        "if aspect = NoAspect then 0 elseif aspect in DEV_ASPECTS then 2 else 1 endif"
+    ),
     Minimize("bool2int(multifaceted_point != SENTINEL_POINT)"),
     Minimize("card(mastery_points)"),
 ]
@@ -101,7 +120,7 @@ def perform_objective(objective):
         f"finished optimizing objective {objective.expr} = {result.objective} in {time.perf_counter() - last_finished:.2f} seconds"
     )
     last_finished = time.perf_counter()
-    print_results()
+    print_results(result.solution)
 
 
 last_finished = time.perf_counter()
@@ -126,4 +145,4 @@ for objective in optimize_mid:
 for objective in optimize_post:
     perform_objective(objective)
 
-print(f"Took {time.perf_counter() - start_time:.3f} seconds")
+print(f"Took {time.perf_counter() - start_time:.2f} seconds")

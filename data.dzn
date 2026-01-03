@@ -110,9 +110,7 @@ constraints = [
 % allow preshrine shrine of blasphemy
 preshrine_blasphemy = true;
 % choose an aspect (valid values are NoAspect (multifaceted), FreeAspect and the aspect names)
-fixed_aspect = NoAspect;
-% original aspect of slot (valid values are aspect names, used to calculate max invested points when aspect is NoAspect)
-original_aspect = Tiran;
+fixed_aspect = FreeAspect;
 allow_multifaceted = false;
 % whether to allow dev and voi-only aspects
 allow_dev_aspects = false;
